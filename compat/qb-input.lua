@@ -1,7 +1,5 @@
 local function exportHandler(exportName, func)
-    AddEventHandler(('__cfx_export_qb-input_%s'):format(exportName), function(setCB)
-        setCB(func)
-    end)
+    AddEventHandler(('__cfx_export_qb-input_%s'):format(exportName), function(setCB) setCB(func) end)
 end
 
 local function convertToOx(data)
@@ -11,15 +9,13 @@ local function convertToOx(data)
     local required = {}
     local nextLabel = nil
     for k, v in ipairs(data.inputs) do
-        if v.isRequired then
-            required[k] = true
-        end
+        if v.isRequired then required[k] = true end
         if v.type == 'text' then
             oxData[#oxData + 1] = {
                 type = 'input',
                 placeholder = v.text,
                 default = v.default,
-                label = nextLabel,
+                label = nextLabel
             }
             names[#oxData] = v.name
             if nextLabel then nextLabel = nil end
@@ -28,7 +24,7 @@ local function convertToOx(data)
                 type = 'number',
                 placeholder = v.text,
                 default = v.default,
-                label = nextLabel,
+                label = nextLabel
             }
             names[#oxData] = v.name
             if nextLabel then nextLabel = nil end
@@ -38,20 +34,20 @@ local function convertToOx(data)
                 placeholder = v.text,
                 icon = 'lock',
                 password = true,
-                label = nextLabel,
+                label = nextLabel
             }
             names[#oxData] = v.name
             if nextLabel then nextLabel = nil end
         elseif v.type == 'radio' then
             oxData[#oxData + 1] = {
                 type = 'select',
-                label = v.text,
+                label = v.text
             }
             for _, option in ipairs(v.options) do
                 oxData[#oxData].options = oxData[#oxData].options or {}
                 oxData[#oxData].options[#oxData[#oxData].options + 1] = {
                     label = option.text,
-                    value = option.value,
+                    value = option.value
                 }
             end
             names[#oxData] = v.name
@@ -72,18 +68,22 @@ local function convertToOx(data)
             else
                 -- fallback to qb-input
                 -- return ShowInput(data, true)
-                return lib.notify({ title = 'Error', description = 'Error', type = 'error' })
+                return lib.notify({
+                    title = 'Error',
+                    description = 'Error',
+                    type = 'error'
+                })
             end
         elseif v.type == 'select' then
             oxData[#oxData + 1] = {
                 type = 'select',
-                label = v.text,
+                label = v.text
             }
             for _, option in ipairs(v.options) do
                 oxData[#oxData].options = oxData[#oxData].options or {}
                 oxData[#oxData].options[#oxData[#oxData].options + 1] = {
                     label = option.text,
-                    value = option.value,
+                    value = option.value
                 }
             end
             names[#oxData] = v.name
@@ -95,7 +95,11 @@ local function convertToOx(data)
     local returnData = {}
     for k, v in pairs(selections) do
         if required[k] and (not v or v == '') then
-            lib.notify({ title = 'Error', description = 'You must fill out all required fields', type = 'error' })
+            lib.notify({
+                title = 'Error',
+                description = 'You must fill out all required fields',
+                type = 'error'
+            })
             return lib.inputDialog(name, oxData)
         end
         returnData[names[k]] = tostring(v)
@@ -103,6 +107,4 @@ local function convertToOx(data)
     return next(returnData) and returnData or nil
 end
 
-exportHandler('ShowInput', function(data)
-    return convertToOx(data)
-end)
+exportHandler('ShowInput', function(data) return convertToOx(data) end)
