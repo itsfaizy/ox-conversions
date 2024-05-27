@@ -19,13 +19,8 @@ local function convertToOx(data)
     for _, v in ipairs(data) do
         -- Formmating conversion
         if v.hidden then goto continue end
-        if v.isMenuHeader and not oxData.title and not v.txt then
+        if (v.isMenuHeader or v.isHeader) and not oxData.title then
             oxData.title = v.header
-        elseif v.isMenuHeader then
-            options[#options + 1] = {
-                title = v.header,
-                description = v.txt,
-            }
         else
             options[#options + 1] = {
                 title = v.header,
@@ -38,7 +33,9 @@ local function convertToOx(data)
                     if v.params.isServer then
                         TriggerServerEvent(v.params.event, v.params.args)
                     else
-                        TriggerEvent(v.params.event, v.params.args)
+                        if v.params.event then
+                            TriggerEvent(v.params.event, v.params.args)
+                        end
                     end
                 end
             }
